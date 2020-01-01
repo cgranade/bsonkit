@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright ⓒ Christopher Granade.
+// Licensed under the MIT License.
+
+using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;

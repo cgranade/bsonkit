@@ -1,3 +1,8 @@
+<!--
+  Copyright ⓒ Christopher Granade.
+  Licensed under the MIT License.
+-->
+
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
