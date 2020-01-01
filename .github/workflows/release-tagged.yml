@@ -1,0 +1,50 @@
+name: "Release Beta Version"
+on:
+  push:
+    tags:
+    - "*.*"
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    
+    # Configure version number
+    - name: Parse previous version
+      env:
+        PREVIOUS_TAG: ${{ github.ref }}
+      run: |
+        $ReleasedVersion = [semver]$Env:PREVIOUS_TAG
+        $AssemblyVersion = [semver]::new(
+          $ReleasedVersion.Major,
+          $ReleasedVersion.Minor,
+          0
+        )
+        $PackageVersion = [semver]::new(
+          $ReleasedVersion.Major,
+          $ReleasedVersion.Minor,
+          0
+        )
+        Write-Host "::set-env name=ASSEMBLY_VERSION::$AssemblyVersion"
+        Write-Host "::set-env name=PACKAGE_VERSION::$PackageVersion"
+      shell: pwsh
+    - run: echo $Env:VERSION
+      shell: pwsh
+
+    # Build and push package
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@master
+      with:
+        dotnet-version: 3.1.100
+        source-url: https://nuget.pkg.github.com/cgranade/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Build BsonKit
+      run: |
+        dotnet build src/bsonkit.csproj /p:AssemblyVersion=$Env:ASSEMBLY_VERSION /p:Version=$Env:PACKAGE_VERSION
+        dotnet pack --configuration Release src/bsonkit.csproj /p:AssemblyVersion=$Env:ASSEMBLY_VERSION /p:Version=$Env:PACKAGE_VERSION
+      shell: pwsh
+    - name: Publish the package to GPR
+      run: dotnet nuget push drop/nupkg/*.nupkg --source https://nuget.pkg.github.com/cgranade/index.json
+    # TODO: testing here.
