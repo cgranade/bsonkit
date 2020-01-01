@@ -14,7 +14,7 @@
 
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bsonkit</ToolCommandName>
-    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <PackageOutputPath>../drop/nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
