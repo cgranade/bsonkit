@@ -1,14 +1,12 @@
 ﻿// Copyright ⓒ Christopher Granade.
 // Licensed under the MIT License.
 
-using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Linq;
 
 namespace BsonKit
 {
@@ -91,6 +89,5 @@ namespace BsonKit
                 JsonToBsonCommand
             }
             .InvokeAsync(args);
-        }
     }
 }
