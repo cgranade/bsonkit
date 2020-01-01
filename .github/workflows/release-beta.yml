@@ -1,0 +1,53 @@
+name: "Release Beta Version"
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    
+    # Configure version number
+    - name: Generate build number
+      id: build_number
+      uses: einaregilsson/build-number@v2 
+      with:
+        token: ${{secrets.github_token}} 
+    
+    - name: Find the previous version of a tag
+      id: previous_tag
+      uses: ncipollo/semantic-version-action@v1
+
+    - name: Parse previous version
+      id: parse_version
+      uses: ncipollo/semantic-version-action@v1
+      with:
+        tag: ${{ steps.previous_tag.outputs.previous_tag }}
+
+    - name: Set VERSION
+      uses: allenevans/set-env@v1.0.0
+      with:
+        VERSION: ${{ steps.parse_version.outputs.major }}.${{ steps.parse_version.outputs.minor }}.${{ steps.build_number.outputs.build_number }}-beta
+
+    - run: echo $Env:VERSION
+      shell: pwsh
+
+    # Build and push package
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+        source-url: https://nuget.pkg.github.com/cgranade/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Build BsonKit
+      run: |
+        dotnet build src/bsonkit.csproj /p:AssemblyVersion=$Env:VERSION /p:Version=$Env:VERSION
+        dotnet pack --configuration Release src/bsonkit.csproj /p:AssemblyVersion=$Env:VERSION /p:Version=$Env:VERSION
+      shell: pwsh
+    - name: Publish the package to GPR
+      run: dotnet nuget push drop/nupkg/*.nupkg
+    # TODO: testing here.
