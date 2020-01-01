@@ -24,7 +24,7 @@ jobs:
 
     - name: Parse previous version
       env:
-        PREVIOUS_TAG: ${{ github.ref }}
+        PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
         BUILD_NUMBER: ${{ steps.build_number.outputs.build-number }}
       run: |
         $ReleasedVersion = [semver]$Env:PREVIOUS_TAG
