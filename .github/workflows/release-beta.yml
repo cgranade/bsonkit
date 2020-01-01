@@ -28,13 +28,19 @@ jobs:
         BUILD_NUMBER: ${{ steps.build_number.outputs.build-number }}
       run: |
         $ReleasedVersion = [semver]$Env:PREVIOUS_TAG
-        $NewVersion = [semver]::new(
+        $AssemblyVersion = [semver]::new(
+          $ReleasedVersion.Major,
+          $ReleasedVersion.Minor,
+          $Env:BUILD_NUMBER
+        )
+        $PackageVersion = [semver]::new(
           $ReleasedVersion.Major,
           $ReleasedVersion.Minor,
           $Env:BUILD_NUMBER,
           "beta"
         )
-        Write-Host "::set-env name=VERSION::$NewVersion"
+        Write-Host "::set-env name=ASSEMBLY_VERSION::$AssemblyVersion"
+        Write-Host "::set-env name=PACKAGE_VERSION::$PackageVersion"
       shell: pwsh
     - run: echo $Env:VERSION
       shell: pwsh
@@ -49,8 +55,8 @@ jobs:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     - name: Build BsonKit
       run: |
-        dotnet build src/bsonkit.csproj /p:AssemblyVersion=$Env:VERSION /p:Version=$Env:VERSION
-        dotnet pack --configuration Release src/bsonkit.csproj /p:AssemblyVersion=$Env:VERSION /p:Version=$Env:VERSION
+        dotnet build src/bsonkit.csproj /p:AssemblyVersion=$Env:ASSEMBLY_VERSION /p:Version=$Env:PACKAGE_VERSION
+        dotnet pack --configuration Release src/bsonkit.csproj /p:AssemblyVersion=$Env:ASSEMBLY_VERSION /p:Version=$Env:PACKAGE_VERSION
       shell: pwsh
     - name: Publish the package to GPR
       run: dotnet nuget push drop/nupkg/*.nupkg
