@@ -13,7 +13,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.100
-    - run: dotnet build src/bsonkit.csproj
+    - run: |
+        pwd
+        dotnet build src/bsonkit.csproj
       name: Build BsonKit
-      working-directory: "$GITHUB_WORKSPACE"
     # TODO: testing here.
